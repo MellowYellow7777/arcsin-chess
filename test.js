@@ -1343,7 +1343,6 @@ function draw() {
   ctx.clearRect(0,0,s,s);
   drawCells('#EED7B0','#B88762');
   drawGridlines('black',2);
-  return;
   if (mode !== 'edit') hl();
 
   Piece.all.forEach(piece => {
