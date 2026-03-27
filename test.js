@@ -1,13 +1,3 @@
-var canvas = document.createElement('canvas');
-document.body.appendChild(canvas);
-var ctx = canvas.getContext('2d');
-ctx.fillStyle = 'red';
-ctx.fillRect(0,0,canvas.width,canvas.height);
-
-
-
-function no() {
-
 if (!Array.prototype.toReversed) {
   Array.prototype.toReversed = function() {
     var res = [];
@@ -319,6 +309,10 @@ canvas = document.createElement('canvas');
 ctx = canvas.getContext('2d');
 document.body.appendChild(canvas);
 
+ctx.fillStyle = 'red';
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+function no() {
 var mouse = {
   cx: 0,
   cy: 0,
