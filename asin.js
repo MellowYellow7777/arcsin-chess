@@ -1,3 +1,15 @@
+if (!Array.prototype.toReversed) {
+  Array.prototype.toReversed = function() {
+    var res = [];
+    var len = this.length;
+    var lenm1 = len - 1;
+    for (var i = 0; i < len; i++) {
+      res[i] = this[lenm1 - i]; 
+    }
+    return res;
+  }
+}
+
 var edges = {
   A0: [[0.311,0.066],[0.323,0.077],[0.335,0.086],[0.348,0.094]],
   A1: [[0.348,0.094],[0.363,0.104],[0.378,0.111],[0.393,0.118]],
