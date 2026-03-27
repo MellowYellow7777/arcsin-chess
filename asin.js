@@ -1051,7 +1051,7 @@ Queen.prototype.getMoves = function() {
 };
 
 var CASTLE_DATA = [
-    [4, 7, 6, 1, 'white'],
+    [4, 7, 6, 5, 'white'],
     [4, 0, 2, 3, 'white'],
     [60, 63, 62, 61, 'black'],
     [60, 56, 58, 59, 'black'],
