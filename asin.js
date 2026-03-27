@@ -1,15 +1,3 @@
-if (!Array.prototype.toReversed) {
-  Array.prototype.toReversed = function() {
-    var res = [];
-    var len = this.length;
-    var lenm1 = len - 1;
-    for (var i = 0; i < len; i++) {
-      res[i] = this[lenm1 - i]; 
-    }
-    return res;
-  }
-}
-
 var edges = {
   A0: [[0.311,0.066],[0.323,0.077],[0.335,0.086],[0.348,0.094]],
   A1: [[0.348,0.094],[0.363,0.104],[0.378,0.111],[0.393,0.118]],
@@ -186,7 +174,8 @@ var centers = [
   [0.531,0.167],[0.590,0.154],[0.643,0.130],[0.687,0.100],
 ];
 
-var orientation = [
+// orientations because if i just use orientation mobile will just not work...
+var orientations = [
   -0.648,-0.490,-0.298,-0.091,0.091,0.298,0.490,0.648,
   -0.772,-0.565,-0.336,-0.117,0.117,0.336,0.565,0.772,
   -0.927,-0.695,-0.391,-0.137,0.137,0.391,0.695,0.927,
@@ -209,7 +198,7 @@ var scales = [
 ];
 
 var getOrientation = (() => {
-  var vectors = orientation.map(a => [Math.cos(a), Math.sin(a)]);
+  var vectors = orientations.map(a => [Math.cos(a), Math.sin(a)]);
   var field = Array(128).fill().map(_ => Array(128).fill(0));
 
   for (var iy = 0; iy < 128; iy++) {
@@ -239,7 +228,7 @@ var getOrientation = (() => {
       }
 
       field[iy][ix] = exact !== -1
-        ? orientation[exact]
+        ? orientations[exact]
         : Math.atan2(vy,vx);
     }
   }
@@ -294,7 +283,7 @@ var getScale = (() => {
 })();
 
 
-/*
+
 document.body.style = `
   display: flex;
   justify-content: center;
@@ -303,7 +292,6 @@ document.body.style = `
   padding: 0;
   background-color: black;
 `;
-*/
 
 canvas = document.createElement('canvas');
 ctx = canvas.getContext('2d');
@@ -449,7 +437,7 @@ function drawImage(img,id) {
   var [x,y] = centers[id];
   x *= s;
   y *= s;
-  var phi = orientation[id];
+  var phi = orientations[id];
   var scl = scales[id]*s;
   var w = scl;
   var h = scl;
@@ -502,101 +490,103 @@ function addCell(edges,dirs) {
 }
 
 var allEdges;
-var e = edges;
-//with (edges) {
+// grabbing keys from edges...
+// so i can do this: "[F0,S0,E0,R0]"
+// instead of this: "[edges.F0,edges.S0,edges.E0,edges.R0]"
+with (edges) {
   allEdges = [
-    e.A0,e.A1,e.A2,e.A3,e.A4,e.A5,e.A6,e.A7,
-    e.B0,e.B1,e.B2,e.B3,e.B4,e.B5,e.B6,e.B7,
-    e.C0,e.C1,e.C2,e.C3,e.C4,e.C5,e.C6,e.C7,
-    e.D0,e.D1,e.D2,e.D3,e.D4,e.D5,e.D6,e.D7,
-    e.E0,e.E1,e.E2,e.E3,e.E4,e.E5,e.E6,e.E7,
-    e.F0,e.F1,e.F2,e.F3,e.F4,e.F5,e.F6,e.F7,
-    e.G0,e.G1,e.G2,e.G3,e.G4,e.G5,e.G6,e.G7,
-    e.H0,e.H1,e.H2,e.H3,e.H4,e.H5,e.H6,e.H7,
-    e.I0,e.I1,e.I2,e.I3,e.J0,e.J1,e.J2,e.J3,
-    e.K0,e.K1,e.K2,e.K3,e.L0,e.L1,e.L2,e.L3,
-    e.M0,e.M1,e.M2,e.M3,e.N0,e.N1,e.N2,e.N3,
-    e.O0,e.O1,e.O2,e.O3,e.P0,e.P1,e.P2,e.P3,
-    e.Q0,e.Q1,e.Q2,e.Q3,e.R0,e.R1,e.R2,e.R3,
-    e.S0,e.S1,e.S2,e.S3,e.T0,e.T1,e.T2,e.T3,
-    e.U0,e.U1,e.U2,e.U3,e.V0,e.V1,e.V2,e.V3,
-    e.W0,e.W1,e.W2,e.W3,e.X0,e.X1,e.X2,e.X3,
-    e.Y0,e.Y1,e.Y2,e.Y3,e.Z0,e.Z1,e.Z2,e.Z3,
-    e.l0,e.l1,e.l2,e.l3,e.r0,e.r1,e.r2,e.r3,
-    e.m0,e.m1,e.m2,e.m3
+    A0,A1,A2,A3,A4,A5,A6,A7,
+    B0,B1,B2,B3,B4,B5,B6,B7,
+    C0,C1,C2,C3,C4,C5,C6,C7,
+    D0,D1,D2,D3,D4,D5,D6,D7,
+    E0,E1,E2,E3,E4,E5,E6,E7,
+    F0,F1,F2,F3,F4,F5,F6,F7,
+    G0,G1,G2,G3,G4,G5,G6,G7,
+    H0,H1,H2,H3,H4,H5,H6,H7,
+    I0,I1,I2,I3,J0,J1,J2,J3,
+    K0,K1,K2,K3,L0,L1,L2,L3,
+    M0,M1,M2,M3,N0,N1,N2,N3,
+    O0,O1,O2,O3,P0,P1,P2,P3,
+    Q0,Q1,Q2,Q3,R0,R1,R2,R3,
+    S0,S1,S2,S3,T0,T1,T2,T3,
+    U0,U1,U2,U3,V0,V1,V2,V3,
+    W0,W1,W2,W3,X0,X1,X2,X3,
+    Y0,Y1,Y2,Y3,Z0,Z1,Z2,Z3,
+    l0,l1,l2,l3,r0,r1,r2,r3,
+    m0,m1,m2,m3
   ];
-  addCell([e.F0,e.S0,e.E0,e.R0],[0,1,1,0]); // 0
-  addCell([e.F1,e.T0,e.E1,e.S0],[0,1,1,0]); // 1
-  addCell([e.F2,e.U0,e.E2,e.T0],[0,1,1,0]); // 2
-  addCell([e.F3,e.V0,e.E3,e.U0],[0,1,1,0]); // 3
-  addCell([e.F4,e.W0,e.E4,e.V0],[0,1,1,0]); // 4
-  addCell([e.F5,e.X0,e.E5,e.W0],[0,1,1,0]); // 5
-  addCell([e.F6,e.Y0,e.E6,e.X0],[0,1,1,0]); // 6
-  addCell([e.F7,e.Z0,e.E7,e.Y0],[0,1,1,0]); // 7
-  //----------------------------------------//
-  addCell([e.G0,e.S1,e.F0,e.R1],[0,1,1,0]); // 8
-  addCell([e.G1,e.T1,e.F1,e.S1],[0,1,1,0]); // 9
-  addCell([e.G2,e.U1,e.F2,e.T1],[0,1,1,0]); // 10
-  addCell([e.G3,e.V1,e.F3,e.U1],[0,1,1,0]); // 11
-  addCell([e.G4,e.W1,e.F4,e.V1],[0,1,1,0]); // 12
-  addCell([e.G5,e.X1,e.F5,e.W1],[0,1,1,0]); // 13
-  addCell([e.G6,e.Y1,e.F6,e.X1],[0,1,1,0]); // 14
-  addCell([e.G7,e.Z1,e.F7,e.Y1],[0,1,1,0]); // 15
-  //----------------------------------------//
-  addCell([e.H0,e.S2,e.G0,e.R2],[0,1,1,0]); // 16
-  addCell([e.H1,e.T2,e.G1,e.S2],[0,1,1,0]); // 17
-  addCell([e.H2,e.U2,e.G2,e.T2],[0,1,1,0]); // 18
-  addCell([e.H3,e.V2,e.G3,e.U2],[0,1,1,0]); // 19
-  addCell([e.H4,e.W2,e.G4,e.V2],[0,1,1,0]); // 20
-  addCell([e.H5,e.X2,e.G5,e.W2],[0,1,1,0]); // 21
-  addCell([e.H6,e.Y2,e.G6,e.X2],[0,1,1,0]); // 22
-  addCell([e.H7,e.Z2,e.G7,e.Y2],[0,1,1,0]); // 23
-  //----------------------------------------//
-  addCell([e.l3,e.S3,e.H0,e.R3],[0,1,1,0]); // 24
-  addCell([e.l2,e.T3,e.H1,e.S3],[0,1,1,0]); // 25
-  addCell([e.m0,e.U3,e.H2,e.T3],[0,1,1,0]); // 26
-  addCell([e.m1,e.V3,e.H3,e.U3],[0,1,1,0]); // 27
-  addCell([e.m2,e.W3,e.H4,e.V3],[0,1,1,0]); // 28
-  addCell([e.m3,e.X3,e.H5,e.W3],[0,1,1,0]); // 29
-  addCell([e.r2,e.Y3,e.H6,e.X3],[1,1,1,0]); // 30
-  addCell([e.r3,e.Z3,e.H7,e.Y3],[1,1,1,0]); // 31
+  addCell([F0,S0,E0,R0],[0,1,1,0]); // 0
+  addCell([F1,T0,E1,S0],[0,1,1,0]); // 1
+  addCell([F2,U0,E2,T0],[0,1,1,0]); // 2
+  addCell([F3,V0,E3,U0],[0,1,1,0]); // 3
+  addCell([F4,W0,E4,V0],[0,1,1,0]); // 4
+  addCell([F5,X0,E5,W0],[0,1,1,0]); // 5
+  addCell([F6,Y0,E6,X0],[0,1,1,0]); // 6
+  addCell([F7,Z0,E7,Y0],[0,1,1,0]); // 7
+  //------------------------------//
+  addCell([G0,S1,F0,R1],[0,1,1,0]); // 8
+  addCell([G1,T1,F1,S1],[0,1,1,0]); // 9
+  addCell([G2,U1,F2,T1],[0,1,1,0]); // 10
+  addCell([G3,V1,F3,U1],[0,1,1,0]); // 11
+  addCell([G4,W1,F4,V1],[0,1,1,0]); // 12
+  addCell([G5,X1,F5,W1],[0,1,1,0]); // 13
+  addCell([G6,Y1,F6,X1],[0,1,1,0]); // 14
+  addCell([G7,Z1,F7,Y1],[0,1,1,0]); // 15
+  //------------------------------//
+  addCell([H0,S2,G0,R2],[0,1,1,0]); // 16
+  addCell([H1,T2,G1,S2],[0,1,1,0]); // 17
+  addCell([H2,U2,G2,T2],[0,1,1,0]); // 18
+  addCell([H3,V2,G3,U2],[0,1,1,0]); // 19
+  addCell([H4,W2,G4,V2],[0,1,1,0]); // 20
+  addCell([H5,X2,G5,W2],[0,1,1,0]); // 21
+  addCell([H6,Y2,G6,X2],[0,1,1,0]); // 22
+  addCell([H7,Z2,G7,Y2],[0,1,1,0]); // 23
+  //------------------------------//
+  addCell([l3,S3,H0,R3],[0,1,1,0]); // 24
+  addCell([l2,T3,H1,S3],[0,1,1,0]); // 25
+  addCell([m0,U3,H2,T3],[0,1,1,0]); // 26
+  addCell([m1,V3,H3,U3],[0,1,1,0]); // 27
+  addCell([m2,W3,H4,V3],[0,1,1,0]); // 28
+  addCell([m3,X3,H5,W3],[0,1,1,0]); // 29
+  addCell([r2,Y3,H6,X3],[1,1,1,0]); // 30
+  addCell([r3,Z3,H7,Y3],[1,1,1,0]); // 31
   //==============================//
-  addCell([e.D0,e.J3,e.l1,e.I3],[0,0,1,1]); // 32
-  addCell([e.D1,e.K3,e.l0,e.J3],[0,0,1,1]); // 33
-  addCell([e.D2,e.L3,e.m0,e.K3],[0,0,1,1]); // 34
-  addCell([e.D3,e.M3,e.m1,e.L3],[0,0,1,1]); // 35
-  addCell([e.D4,e.N3,e.m2,e.M3],[0,0,1,1]); // 36
-  addCell([e.D5,e.O3,e.m3,e.N3],[0,0,1,1]); // 37
-  addCell([e.D6,e.P3,e.r0,e.O3],[0,0,0,1]); // 38
-  addCell([e.D7,e.Q3,e.r1,e.P3],[0,0,0,1]); // 39
-  //----------------------------------------//
-  addCell([e.C0,e.J2,e.D0,e.I2],[0,0,1,1]); // 40
-  addCell([e.C1,e.K2,e.D1,e.J2],[0,0,1,1]); // 41
-  addCell([e.C2,e.L2,e.D2,e.K2],[0,0,1,1]); // 42
-  addCell([e.C3,e.M2,e.D3,e.L2],[0,0,1,1]); // 43
-  addCell([e.C4,e.N2,e.D4,e.M2],[0,0,1,1]); // 44
-  addCell([e.C5,e.O2,e.D5,e.N2],[0,0,1,1]); // 45
-  addCell([e.C6,e.P2,e.D6,e.O2],[0,0,1,1]); // 46
-  addCell([e.C7,e.Q2,e.D7,e.P2],[0,0,1,1]); // 47
-  //----------------------------------------//
-  addCell([e.B0,e.J1,e.C0,e.I1],[0,0,1,1]); // 48
-  addCell([e.B1,e.K1,e.C1,e.J1],[0,0,1,1]); // 49
-  addCell([e.B2,e.L1,e.C2,e.K1],[0,0,1,1]); // 50
-  addCell([e.B3,e.M1,e.C3,e.L1],[0,0,1,1]); // 51
-  addCell([e.B4,e.N1,e.C4,e.M1],[0,0,1,1]); // 52
-  addCell([e.B5,e.O1,e.C5,e.N1],[0,0,1,1]); // 53
-  addCell([e.B6,e.P1,e.C6,e.O1],[0,0,1,1]); // 54
-  addCell([e.B7,e.Q1,e.C7,e.P1],[0,0,1,1]); // 55
-  //----------------------------------------//
-  addCell([e.A0,e.J0,e.B0,e.I0],[0,0,1,1]); // 56
-  addCell([e.A1,e.K0,e.B1,e.J0],[0,0,1,1]); // 57
-  addCell([e.A2,e.L0,e.B2,e.K0],[0,0,1,1]); // 58
-  addCell([e.A3,e.M0,e.B3,e.L0],[0,0,1,1]); // 59
-  addCell([e.A4,e.N0,e.B4,e.M0],[0,0,1,1]); // 60
-  addCell([e.A5,e.O0,e.B5,e.N0],[0,0,1,1]); // 61
-  addCell([e.A6,e.P0,e.B6,e.O0],[0,0,1,1]); // 62
-  addCell([e.A7,e.Q0,e.B7,e.P0],[0,0,1,1]); // 63
-//}
+  addCell([D0,J3,l1,I3],[0,0,1,1]); // 32
+  addCell([D1,K3,l0,J3],[0,0,1,1]); // 33
+  addCell([D2,L3,m0,K3],[0,0,1,1]); // 34
+  addCell([D3,M3,m1,L3],[0,0,1,1]); // 35
+  addCell([D4,N3,m2,M3],[0,0,1,1]); // 36
+  addCell([D5,O3,m3,N3],[0,0,1,1]); // 37
+  addCell([D6,P3,r0,O3],[0,0,0,1]); // 38
+  addCell([D7,Q3,r1,P3],[0,0,0,1]); // 39
+  //------------------------------//
+  addCell([C0,J2,D0,I2],[0,0,1,1]); // 40
+  addCell([C1,K2,D1,J2],[0,0,1,1]); // 41
+  addCell([C2,L2,D2,K2],[0,0,1,1]); // 42
+  addCell([C3,M2,D3,L2],[0,0,1,1]); // 43
+  addCell([C4,N2,D4,M2],[0,0,1,1]); // 44
+  addCell([C5,O2,D5,N2],[0,0,1,1]); // 45
+  addCell([C6,P2,D6,O2],[0,0,1,1]); // 46
+  addCell([C7,Q2,D7,P2],[0,0,1,1]); // 47
+  //------------------------------//
+  addCell([B0,J1,C0,I1],[0,0,1,1]); // 48
+  addCell([B1,K1,C1,J1],[0,0,1,1]); // 49
+  addCell([B2,L1,C2,K1],[0,0,1,1]); // 50
+  addCell([B3,M1,C3,L1],[0,0,1,1]); // 51
+  addCell([B4,N1,C4,M1],[0,0,1,1]); // 52
+  addCell([B5,O1,C5,N1],[0,0,1,1]); // 53
+  addCell([B6,P1,C6,O1],[0,0,1,1]); // 54
+  addCell([B7,Q1,C7,P1],[0,0,1,1]); // 55
+  //------------------------------//
+  addCell([A0,J0,B0,I0],[0,0,1,1]); // 56
+  addCell([A1,K0,B1,J0],[0,0,1,1]); // 57
+  addCell([A2,L0,B2,K0],[0,0,1,1]); // 58
+  addCell([A3,M0,B3,L0],[0,0,1,1]); // 59
+  addCell([A4,N0,B4,M0],[0,0,1,1]); // 60
+  addCell([A5,O0,B5,N0],[0,0,1,1]); // 61
+  addCell([A6,P0,B6,O0],[0,0,1,1]); // 62
+  addCell([A7,Q0,B7,P0],[0,0,1,1]); // 63
+}
 
 function drawGridlines(color='black',lineWidth=2) {
   ctx.lineWidth = lineWidth;
@@ -1061,7 +1051,7 @@ Queen.prototype.getMoves = function() {
 };
 
 var CASTLE_DATA = [
-    [4, 7, 6, 5, 'white'],
+    [4, 7, 6, 1, 'white'],
     [4, 0, 2, 3, 'white'],
     [60, 63, 62, 61, 'black'],
     [60, 56, 58, 59, 'black'],
