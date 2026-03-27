@@ -1,3 +1,13 @@
+var canvas = document.createElement('canvas');
+document.body.appendChild(canvas);
+var ctx = canvas.getContext('2d');
+ctx.fillStyle = 'red';
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+
+
+function no() {
+
 if (!Array.prototype.toReversed) {
   Array.prototype.toReversed = function() {
     var res = [];
@@ -1407,3 +1417,5 @@ function loop() {
 }
 
 loop();
+
+}
