@@ -294,7 +294,7 @@ var getScale = (() => {
 })();
 
 
-
+/*
 document.body.style = `
   display: flex;
   justify-content: center;
@@ -303,6 +303,7 @@ document.body.style = `
   padding: 0;
   background-color: black;
 `;
+*/
 
 canvas = document.createElement('canvas');
 ctx = canvas.getContext('2d');
